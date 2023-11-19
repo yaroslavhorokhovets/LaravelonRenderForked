@@ -87,7 +87,7 @@
                 <div class="links">
                     <a href="https://red-track.net/click/docs">Docs</a>
                     <a href="https://red-track.net/click/laracasts">Laracasts</a>
-                    <a href="https://red-track.net/clicknews">News</a>
+                    <a href="https://red-track.net/click/news">News</a>
                     <a href="https://red-track.net/click/blog">Blog</a>
                     <a href="https://red-track.net/click/nova">Nova</a>
                     <a href="https://red-track.net/click/forge">Forge</a>
