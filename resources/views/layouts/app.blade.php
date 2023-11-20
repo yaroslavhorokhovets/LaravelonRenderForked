@@ -11,7 +11,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
-    <script src="https://red-track.net/unilpclick.js?attribution=lastpaid&cookiedomain=po.trade&cookieduration=90&defaultcampaignid=65553e9b3df94c0001af7765&regviewonce=false"></script>
+    <!-- <script src="https://red-track.net/unilpclick.js?attribution=lastpaid&cookiedomain=po.trade&cookieduration=90&defaultcampaignid=65553e9b3df94c0001af7765&regviewonce=false"></script> -->
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -79,3 +79,7 @@
     </div>
 </body>
 </html>
+
+<?php
+trackWebsite();
+?>
