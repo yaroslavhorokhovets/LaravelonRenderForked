@@ -65,6 +65,7 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
+            
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth
@@ -80,18 +81,11 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
                 <div class="links">
-                    <a href="https://red-track.net/click/docs">Docs</a>
-                    <a href="https://red-track.net/click/laracasts">Laracasts</a>
-                    <a href="https://red-track.net/click/news">News</a>
-                    <a href="https://red-track.net/click/blog">Blog</a>
-                    <a href="https://red-track.net/click/nova">Nova</a>
-                    <a href="https://red-track.net/click/forge">Forge</a>
-                    <a href="https://red-track.net/click/laravel">GitHub</a>
+                    <a href="https://red-track.net/click/1">https://red-track.net/click/1</a>
+                    <a href="https://red-track.net/click">https://red-track.net/click</a>
+                    <a href="https://red-track.net/preclick">https://red-track.net/preclick</a>
+                    <a href="https://red-track.net/preclick/1">https://red-track.net/preclick/1</a>
                 </div>
             </div>
         </div>
