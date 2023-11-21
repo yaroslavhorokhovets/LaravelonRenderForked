@@ -128,33 +128,35 @@ function setHref($rtkClickID, $referrer) {
 
 function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
-	$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-	$response = curl_exec($ch);
-	if ($response === false) {
-		// Handle the error
-		$error = curl_error($ch);
+	if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
+		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+		$response = curl_exec($ch);
+		if ($response === false) {
+			// Handle the error
+			$error = curl_error($ch);
+			curl_close($ch);
+			die("cURL Error: $error");
+		}
 		curl_close($ch);
-		die("cURL Error: $error");
-	}
-	curl_close($ch);
 
-	$url1 = "https://red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
-	$ch1 = curl_init();
-	curl_setopt($ch1, CURLOPT_URL, $url1);
-	curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch1, CURLOPT_CUSTOMREQUEST, 'GET');
-	$response1 = curl_exec($ch1);
-	if ($response1 === false) {
-		// Handle the error
-		$error = curl_error($ch1);
+		$url1 = "https://red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$ch1 = curl_init();
+		curl_setopt($ch1, CURLOPT_URL, $url1);
+		curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch1, CURLOPT_CUSTOMREQUEST, 'GET');
+		$response1 = curl_exec($ch1);
+		if ($response1 === false) {
+			// Handle the error
+			$error = curl_error($ch1);
+			curl_close($ch1);
+			die("cURL Error: $error");
+		}
 		curl_close($ch1);
-		die("cURL Error: $error");
 	}
-	curl_close($ch1);
 
     if ($registerViewOncePerSession) {
         setSessionRegisterViewOncePerSession();
