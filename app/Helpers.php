@@ -88,7 +88,7 @@ function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cook
 }
 
 function getSessionRegisterViewOncePerSession() {
-    return $_SESSION["viewOnce"];
+    return isset($_SESSION["viewOnce"]) ? $_SESSION["viewOnce"] : 0;
 }
 
 function setSessionRegisterViewOncePerSession() {
