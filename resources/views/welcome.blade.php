@@ -93,7 +93,4 @@
             </div>
         </div>
     </body>
-    <?php
-        // trackWebsite();
-    ?>
 </html>
