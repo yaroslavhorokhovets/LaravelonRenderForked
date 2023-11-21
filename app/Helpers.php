@@ -128,7 +128,7 @@ function setHref($rtkClickID, $referrer) {
 
 function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
-	if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
+	// if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
 		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -156,7 +156,7 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 			die("cURL Error: $error");
 		}
 		curl_close($ch1);
-	}
+	// }
 
     if ($registerViewOncePerSession) {
         setSessionRegisterViewOncePerSession();
