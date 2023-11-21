@@ -117,6 +117,13 @@ function setHref($rtkClickID, $referrer) {
 					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				}
 			}
+			if (el.href.indexOf("https://red-track.net/preclick") > -1) {
+				if (el.href.indexOf('?') > -1) {
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
+				} else {
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
+				}
+			}
 		})
 	</script>
 	HEREA;
@@ -124,19 +131,36 @@ function setHref($rtkClickID, $referrer) {
 }
 
 function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
-	$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-	$response = curl_exec($ch);
-	if ($response === false) {
-		// Handle the error
-		$error = curl_error($ch);
+
+	if(getSessionRegisterViewOncePerSession() != 1){
+		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+		$response = curl_exec($ch);
+		if ($response === false) {
+			// Handle the error
+			$error = curl_error($ch);
+			curl_close($ch);
+			die("cURL Error: $error");
+		}
 		curl_close($ch);
-		die("cURL Error: $error");
+
+		$url = "https://red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+		$response = curl_exec($ch);
+		if ($response === false) {
+			// Handle the error
+			$error = curl_error($ch);
+			curl_close($ch);
+			die("cURL Error: $error");
+		}
+		curl_close($ch);
 	}
-	curl_close($ch);
 
     if ($registerViewOncePerSession) {
         setSessionRegisterViewOncePerSession();
