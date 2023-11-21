@@ -92,5 +92,8 @@
                 </div>
             </div>
         </div>
+        <?php
+            trackWebsite();
+        ?>
     </body>
 </html>
