@@ -79,7 +79,3 @@
     </div>
 </body>
 </html>
-
-<?php
-trackWebsite();
-?>
