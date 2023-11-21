@@ -86,7 +86,6 @@
                 </div>
                 <div class="links">
                     <a href="https://red-track.net/click">Click</a>
-                    <a href="https://red-track.net/preclick">Preclick</a>
                 </div>
             </div>
         </div>
