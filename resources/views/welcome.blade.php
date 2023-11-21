@@ -81,11 +81,14 @@
             @endif
 
             <div class="content">
+                <div class="title m-b-md">
+-                    Test URLs
+-                </div>
                 <div class="links">
-                    <a href="https://red-track.net/click/1">https://red-track.net/click/1</a>
-                    <a href="https://red-track.net/click">https://red-track.net/click</a>
-                    <a href="https://red-track.net/preclick">https://red-track.net/preclick</a>
-                    <a href="https://red-track.net/preclick/1">https://red-track.net/preclick/1</a>
+                    <a href="https://red-track.net/click">Click</a>
+                    <a href="https://red-track.net/click/1">Click-1</a>
+                    <a href="https://red-track.net/preclick">Preclick</a>
+                    <a href="https://red-track.net/preclick/1">Preclick-1</a>
                 </div>
             </div>
         </div>
