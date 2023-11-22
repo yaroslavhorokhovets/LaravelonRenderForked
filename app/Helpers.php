@@ -108,16 +108,16 @@ function setHref($rtkClickID, $referrer) {
 		document.querySelectorAll('a').forEach(function (el) {
 			if (el.href.indexOf("https://red-track.net/click") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
 				}
 			}
 			if (el.href.indexOf("https://red-track.net/preclick") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
 				}
 			}
 		})
@@ -128,7 +128,7 @@ function setHref($rtkClickID, $referrer) {
 
 function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
-	// if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
+	if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
 		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -156,7 +156,7 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 			die("cURL Error: $error");
 		}
 		curl_close($ch1);
-	// }
+	}
 
     if ($registerViewOncePerSession) {
         setSessionRegisterViewOncePerSession();
