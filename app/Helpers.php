@@ -188,7 +188,7 @@ function trackWebsite(){
 	$rtkfbp = getMyCookie('_fbp');
 	$rtkfbc = getMyCookie('_fbc');
 	$pixelParams = ($locSearch != '' ? ("&" . $locSearch) : "") . "&sub19=" . $rtkfbp . "&sub20=" . $rtkfbc;
-	$campaignID = getURLParam('cmpid', $locSearch);
+	$campaignID = "65553f4440736d0001a9145d";// getURLParam('cmpid', $locSearch);
 	$souceKey = getURLParam('tsource', $locSearch);
 	if (!isset($campaignID) || $campaignID == "") {
 		$campaignID = $defaultCampaignId;
