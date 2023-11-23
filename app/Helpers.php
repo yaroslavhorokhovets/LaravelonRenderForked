@@ -218,20 +218,20 @@ function trackWebsite(){
 				curl_close($ch);
 				die("cURL Error: $error");
 			}
-			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
+			$rtkClickID = getDeviceID(); // isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
 			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
-			$rtkClickID = getSessionClickID();
+			$rtkClickID = getDeviceID(); // getSessionClickID();
 			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
-		$rtkClickID = getURLParam('rtkcid', $locSearch);
+		$rtkClickID = getDeviceID(); // getURLParam('rtkcid', $locSearch);
 		checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		setHref($rtkClickID, $referrer);
