@@ -58,19 +58,12 @@ function getCurrentLocationSearch() {
 	return isset($locArr[1]) ? $locArr[1] : "";
 }
 
-function getURLParam($key, $sourceURL) {
-	$rtn = "";
-	$params_arr = [];
-	if ($sourceURL != "") {
-    	$params_arr = explode("&", $sourceURL);
-    	foreach ($params_arr as $index=>$params) {
-        	$subparams = explode("=", $params);
-        	if ($subparams[0] == $key) {
-            	$rtn = isset($subparams[1]) ? $subparams[1] : "";
-        	}
-    	}
+function getURLParam($key) {
+	$ret = isset($_GET[$key]) ? $_GET[$key] : '';
+	if($key == 'cmpid'){
+		$ret = "65553f4440736d0001a9145d";
 	}
-	return $rtn;
+	return $ret;
 }
 
 function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
@@ -188,8 +181,8 @@ function trackWebsite(){
 	$rtkfbp = getMyCookie('_fbp');
 	$rtkfbc = getMyCookie('_fbc');
 	$pixelParams = ($locSearch != '' ? ("&" . $locSearch) : "") . "&sub19=" . $rtkfbp . "&sub20=" . $rtkfbc;
-	$campaignID = "65553f4440736d0001a9145d";// getURLParam('cmpid', $locSearch);
-	$souceKey = getURLParam('tsource', $locSearch);
+	$campaignID = getURLParam('cmpid');
+	$souceKey = getURLParam('tsource');
 	if (!isset($campaignID) || $campaignID == "") {
 		$campaignID = $defaultCampaignId;
 	}
@@ -203,7 +196,7 @@ function trackWebsite(){
 	$initialSrc = removeParam("cost", $initialSrc);
 	$initialSrc = removeParam("ref_id", $initialSrc);
 
-	if (!getURLParam('rtkcid', $locSearch)) {
+	if (!getURLParam('rtkcid')) {
 		$rtkClickID = "";
 		if (!getSessionClickID()) {
 			$url = $initialSrc . $pixelParams;
@@ -231,7 +224,7 @@ function trackWebsite(){
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
-		$rtkClickID = getURLParam('rtkcid', $locSearch);
+		$rtkClickID = getURLParam('rtkcid');
 		checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		setHref($rtkClickID, $referrer);
