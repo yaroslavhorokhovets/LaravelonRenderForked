@@ -59,11 +59,7 @@ function getCurrentLocationSearch() {
 }
 
 function getURLParam($key) {
-	$ret = isset($_GET[$key]) ? $_GET[$key] : '';
-	if($key == 'cmpid'){
-		$ret = "65553f4440736d0001a9145d";
-	}
-	return $ret;
+	return isset($_GET[$key]) ? $_GET[$key] : '';
 }
 
 function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
@@ -101,16 +97,16 @@ function setHref($rtkClickID, $referrer) {
 		document.querySelectorAll('a').forEach(function (el) {
 			if (el.href.indexOf("https://red-track.net/click") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer";
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer";
 				}
 			}
 			if (el.href.indexOf("https://red-track.net/preclick") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer";
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer" + "&cmpid=65553f4440736d0001a9145d&utm_campaign={replace}&sub2={keyword}&sub3={matchtype}&sub4={adgroupid}&sub5={creative}&sub6={campaignid}&sub7={device}&sub8={adposition}&sub9={network}&sub10={placement}&utm_source=Google&wbraid={wbraid}&gbraid={gbraid}&ref_id={gclid}";
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer";
 				}
 			}
 		})
@@ -183,7 +179,7 @@ function trackWebsite(){
 	$pixelParams = ($locSearch != '' ? ("&" . $locSearch) : "") . "&sub19=" . $rtkfbp . "&sub20=" . $rtkfbc;
 	$campaignID = getURLParam('cmpid');
 	$souceKey = getURLParam('tsource');
-	if (!isset($campaignID) || $campaignID == "") {
+	if ($campaignID == "") {
 		$campaignID = $defaultCampaignId;
 	}
 	
