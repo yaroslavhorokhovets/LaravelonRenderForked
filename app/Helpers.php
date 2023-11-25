@@ -71,7 +71,7 @@ function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
 }
 
 function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain) {
-    if (isset($ourCookie) || !$firstClickAttribution) {
+    if (!getMyCookie($cookieName) || !$firstClickAttribution) {
 		setMyCookie($cookieName, $clickID, $cookieDuration, $cookieDomain);
 	}
 }
@@ -171,7 +171,6 @@ function trackWebsite(){
 		$firstClickAttribution = false;
 	}
 	
-	$ourCookie = getMyCookie('rtkclickid-store');
 	$cookieName = "rtkclickid-store";
 	$locSearch = getCurrentLocationSearch();
 	$rtkfbp = getMyCookie('_fbp');
