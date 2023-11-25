@@ -62,20 +62,6 @@ function getURLParam($key) {
 	return isset($_GET[$key]) ? $_GET[$key] : '';
 }
 
-function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
-	date_default_timezone_set("UTC");
-    $cookieValue = $rtkClickID;
-	$expirationTime = 86400 * $cookieDuration * 1000;
-	$dateTimeNow = time();
-	setcookie($cookieName, $cookieValue, $dateTimeNow + $expirationTime, $cookieDomain); 
-}
-
-function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain) {
-    if (!getMyCookie($cookieName) || !$firstClickAttribution) {
-		setMyCookie($cookieName, $clickID, $cookieDuration, $cookieDomain);
-	}
-}
-
 function setSessionRegisterViewOncePerSession() {
     $_SESSION["viewOnce"] = 1;
 }
@@ -154,8 +140,6 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
 function trackWebsite(){
 	$defaultCampaignId = "65553e9b3df94c0001af7765";
-	$cookieDomain = "po.trade";
-	$cookieDuration = 90;
 	$registerViewOncePerSession = false;
 	$lastPaidClickAttribution = false;
 	$firstClickAttribution = false;
@@ -206,21 +190,18 @@ function trackWebsite(){
 				curl_close($ch);
 				die("cURL Error: $error");
 			}
-			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true)); // getDeviceID()
+			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
-			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
 			$rtkClickID = getSessionClickID();
-			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
 		$rtkClickID = getURLParam('rtkcid');
-		checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		setHref($rtkClickID, $referrer);
 		setSessionClickID($rtkClickID);
