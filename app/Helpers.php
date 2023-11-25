@@ -102,7 +102,7 @@ function getSessionClickID() {
 function setSessionClickID($clickID = '') {
 	$path = 'clickids.csv';
 	$row = [getDeviceID(), $clickID];
-	if (($open = fopen($path, "w")) !== false) {
+	if (($open = fopen($path, "a")) !== false) {
 		fputcsv($open, $row);
 		fclose($open);
 	}
