@@ -62,16 +62,50 @@ function getURLParam($key) {
 	return isset($_GET[$key]) ? $_GET[$key] : '';
 }
 
+function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
+	date_default_timezone_set("UTC");
+    $cookieValue = $rtkClickID;
+	$expirationTime = 86400 * $cookieDuration * 1000;
+	$dateTimeNow = time();
+	setcookie($cookieName, $cookieValue, $dateTimeNow + $expirationTime, $cookieDomain); 
+}
+
+function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain) {
+    if (!getMyCookie($cookieName) || !$firstClickAttribution) {
+		setMyCookie($cookieName, $clickID, $cookieDuration, $cookieDomain);
+	}
+}
+
 function setSessionRegisterViewOncePerSession() {
     $_SESSION["viewOnce"] = 1;
 }
 
 function getSessionClickID() {
-    return isset($_SESSION["rtkclickid"]) ? $_SESSION["rtkclickid"] : '';
+	$path = 'clickids.csv';
+	if(file_exists($path)){
+		if (($open = fopen($path, "r")) !== false) {
+			while (($data = fgetcsv($open, 1000, ",")) !== false) {
+				$array[] = $data;
+			}
+			fclose($open);
+		}
+		// Compare fingerprint data
+		foreach($array as $arr){
+			if(isset($arr[0]) && isset($arr[1]) && $arr[0] == getDeviceID()){
+				return $arr[1];
+			}
+		}
+	}
+	return null;
 }
 
 function setSessionClickID($clickID = '') {
-    $_SESSION["rtkclickid"] = $clickID;
+	$path = 'clickids.csv';
+	$row = [getDeviceID(), $clickID];
+	if (($open = fopen($path, "w")) !== false) {
+		fputcsv($open, $row);
+		fclose($open);
+	}
 }
 
 function setHref($rtkClickID, $referrer) {
@@ -140,6 +174,8 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
 function trackWebsite(){
 	$defaultCampaignId = "65553e9b3df94c0001af7765";
+	$cookieDomain = "po.trade";
+	$cookieDuration = 90;
 	$registerViewOncePerSession = false;
 	$lastPaidClickAttribution = false;
 	$firstClickAttribution = false;
