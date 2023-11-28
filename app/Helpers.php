@@ -7,8 +7,11 @@ function getDeviceID()
     $userAgent = $_SERVER['HTTP_USER_AGENT'];
     $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
     $ipAddress = $_SERVER['REMOTE_ADDR'];
+	$method = $_SERVER['REQUEST_METHOD'];
+	$sec_ch_ua = $_SERVER['HTTP_SEC_CH_UA'];
+	$http_accept = $_SERVER['HTTP_ACCEPT'];
 
-    $fingerprint = $userAgent . $acceptLanguage . $ipAddress;
+    $fingerprint = $userAgent . $acceptLanguage . $ipAddress . $method . $sec_ch_ua . $http_accept;
     return md5($fingerprint);
 }
 
@@ -80,8 +83,13 @@ function setSessionRegisterViewOncePerSession() {
     $_SESSION["viewOnce"] = 1;
 }
 
-function getSessionClickID() {
+function getSessionClickID($cookieName) {
+	$ourCookie = getMyCookie($cookieName);
+	if(isset($ourCookie) && $ourCookie != ''){
+		return $ourCookie;
+	}
 	$path = 'clickids.csv';
+	$array = [];
 	if(file_exists($path)){
 		if (($open = fopen($path, "r")) !== false) {
 			while (($data = fgetcsv($open, 1000, ",")) !== false) {
@@ -117,16 +125,16 @@ function setHref($rtkClickID, $referrer) {
 		document.querySelectorAll('a').forEach(function (el) {
 			if (el.href.indexOf("https://red-track.net/click") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer";
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer";
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				}
 			}
 			if (el.href.indexOf("https://red-track.net/preclick") > -1) {
 				if (el.href.indexOf('?') > -1) {
-					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer";
+					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
-					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer";
+					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				}
 			}
 		})
@@ -173,13 +181,13 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 }
 
 function trackWebsite(){
-	$defaultCampaignId = "65553e9b3df94c0001af7765";
-	$cookieDomain = "po.trade";
-	$cookieDuration = 90;
-	$registerViewOncePerSession = false;
+	$defaultCampaignId = $_GET['defaultcampaignid'] ?? "65553e9b3df94c0001af7765";
+	$cookieDomain = $_GET['cookiedomain'] ?? "po.trade";
+	$cookieDuration = $_GET['cookieduration'] ?? 90;
+	$registerViewOncePerSession = $_GET['regviewonce'] ?? false;
 	$lastPaidClickAttribution = false;
 	$firstClickAttribution = false;
-	$attribution = "lastpaid";
+	$attribution = $_GET['attribution'] ?? "lastpaid";
 	$referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "";
 	if ($attribution === 'lastpaid') {
 		$lastPaidClickAttribution = true;
@@ -192,6 +200,7 @@ function trackWebsite(){
 	}
 	
 	$cookieName = "rtkclickid-store";
+	$ourCookie = getMyCookie($cookieName);
 	$locSearch = getCurrentLocationSearch();
 	$rtkfbp = getMyCookie('_fbp');
 	$rtkfbc = getMyCookie('_fbc');
@@ -213,7 +222,7 @@ function trackWebsite(){
 
 	if (!getURLParam('rtkcid')) {
 		$rtkClickID = "";
-		if (!getSessionClickID()) {
+		if (!getSessionClickID($cookieName)) {
 			$url = $initialSrc . $pixelParams;
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -228,16 +237,19 @@ function trackWebsite(){
 			}
 			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
+			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
-			$rtkClickID = getSessionClickID();
+			$rtkClickID = getSessionClickID($cookieName);
+			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
 		$rtkClickID = getURLParam('rtkcid');
+		checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		setHref($rtkClickID, $referrer);
 		setSessionClickID($rtkClickID);
