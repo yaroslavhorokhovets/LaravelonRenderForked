@@ -65,29 +65,11 @@ function getURLParam($key) {
 	return isset($_GET[$key]) ? $_GET[$key] : '';
 }
 
-function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
-	date_default_timezone_set("UTC");
-    $cookieValue = $rtkClickID;
-	$expirationTime = 86400 * $cookieDuration * 1000;
-	$dateTimeNow = time();
-	setcookie($cookieName, $cookieValue, $dateTimeNow + $expirationTime, $cookieDomain); 
-}
-
-function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain) {
-    if (!getMyCookie($cookieName) || !$firstClickAttribution) {
-		setMyCookie($cookieName, $clickID, $cookieDuration, $cookieDomain);
-	}
-}
-
 function setSessionRegisterViewOncePerSession() {
     $_SESSION["viewOnce"] = 1;
 }
 
-function getSessionClickID($cookieName) {
-	$ourCookie = getMyCookie($cookieName);
-	if(isset($ourCookie) && $ourCookie != ''){
-		return $ourCookie;
-	}
+function getSessionClickID() {
 	$path = 'clickids.csv';
 	$array = [];
 	if(file_exists($path)){
@@ -222,7 +204,7 @@ function trackWebsite(){
 
 	if (!getURLParam('rtkcid')) {
 		$rtkClickID = "";
-		if (!getSessionClickID($cookieName)) {
+		if (!getSessionClickID()) {
 			$url = $initialSrc . $pixelParams;
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -237,19 +219,16 @@ function trackWebsite(){
 			}
 			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
-			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
-			$rtkClickID = getSessionClickID($cookieName);
-			checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
+			$rtkClickID = getSessionClickID();
 			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
 		$rtkClickID = getURLParam('rtkcid');
-		checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		setHref($rtkClickID, $referrer);
 		setSessionClickID($rtkClickID);
