@@ -85,10 +85,10 @@
                     Test URLs
                 </div>
                 <div class="links">
-                    <a href="http://track.red-track.net/click">Click</a>
                     <a href="http://track.red-track.net/click/1">Click/1</a>
-                    <a href="http://track.red-track.net/preclick">Preclick</a>
-                    <a href="http://track.red-track.net/preclick/1">Preclick/1</a>
+                    <a href="http://track.red-track.net/click/2">Click/2</a>
+                    <a href="http://track.red-track.net/click/3">Click/3</a>
+                    <a href="http://track.red-track.net/click/4">Click/4</a>
                 </div>
             </div>
         </div>
