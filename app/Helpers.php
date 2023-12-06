@@ -217,7 +217,7 @@ function trackWebsite(){
     $initialSrc = removeParam("ref_id", $initialSrc);
 
     if (!isset($_GET['rtkcid'])) {
-        if(!isset($_SESSION['rtkclickid']) || $_SESSION['rtkclickid'] == ''){
+        if(getSessionClickIDFromCSV() == null){
             $url = $initialSrc . $pixelParams;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -232,12 +232,13 @@ function trackWebsite(){
             } else {
                 $rtkClickID = json_decode($response)->clickid ?? md5(uniqid(rand(), true));
                 setSessionClickID($rtkClickID);
+                setSessionClickIDIntoCSV($rtkClickID);
                 checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
                 xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
             }
             curl_close($ch);
         }else{
-            $rtkClickID = $_SESSION['rtkclickid'];
+            $rtkClickID = getSessionClickIDFromCSV();
             checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
             xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
         }
@@ -246,5 +247,6 @@ function trackWebsite(){
         checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
         xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
         setSessionClickID($rtkClickID);
+        setSessionClickIDIntoCSV($rtkClickID);
     }
 }
