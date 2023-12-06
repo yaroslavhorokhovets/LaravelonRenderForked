@@ -219,18 +219,18 @@ function trackWebsite(){
 			}
 			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
-			//setHref($rtkClickID, $referrer);
+			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
 			$rtkClickID = getSessionClickID();
-			//setHref($rtkClickID, $referrer);
+			setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
 		$rtkClickID = getURLParam('rtkcid');
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
-		//setHref($rtkClickID, $referrer);
+		setHref($rtkClickID, $referrer);
 		setSessionClickID($rtkClickID);
 	}
 
