@@ -2,74 +2,16 @@
 // start session
 session_start();
 
-function getDeviceID()
-{
-    $userAgent = $_SERVER['HTTP_USER_AGENT'];
-    $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-    $ipAddress = $_SERVER['REMOTE_ADDR'];
-	$method = $_SERVER['REQUEST_METHOD'];
-	$sec_ch_ua = $_SERVER['HTTP_SEC_CH_UA'];
-	$http_accept = $_SERVER['HTTP_ACCEPT'];
-
-    $fingerprint = $userAgent . $acceptLanguage . $ipAddress . $method . $sec_ch_ua . $http_accept;
-    return md5($fingerprint);
-}
-
-function getMyCookie($name) {
-	$cookie = isset($_SERVER["HTTP_COOKIE"]) ? $_SERVER["HTTP_COOKIE"] : "";
-	$parts = explode("; ", $cookie);
-	$ret = "";
-	foreach($parts as $part){
-		$subparts = explode("=", $part);
-		if($subparts[0] == $name){
-			$ret = $subparts[1];
-		}
+function setSessionClickIDIntoCSV($clickID = '') {
+	$path = 'clickids.csv';
+	$row = [getDeviceID(), $clickID];
+	if (($open = fopen($path, "a")) !== false) {
+		fputcsv($open, $row);
+		fclose($open);
 	}
-	return $ret;
 }
 
-function removeParam($key, $sourceURL) {
-	$rtn = explode("?", $sourceURL)[0];
-	$param = [];
-	$params_arr = [];
-	$queryString = str_contains($sourceURL, "?") ? explode("?", $sourceURL)[1] : "";
-	if ($queryString != "") {
-    	$params_arr = explode("&", $queryString);
-    	foreach ($params_arr as $index=>$params) {
-        	$param = explode("=", $params)[0];
-        	if ($param == $key) {
-            	array_splice($params_arr, $index, 1);
-        	}
-    	}
-    	$rtn = $rtn . "?" . implode("&", $params_arr);
-	}
-	return $rtn;
-}
-
-function stripTrailingSlash($str) {
-	return rtrim($str, "/");
-}
-
-function getCurrentLocationSearch() {
-	$location = (@$_SERVER["HTTPS"] == "on") ? "https://" : "http://";
-	if ($_SERVER["SERVER_PORT"] != "80") {
-		$location .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
-	} else {
-		$location .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
-	}
-	$locArr = explode("search?", $location);
-	return isset($locArr[1]) ? $locArr[1] : "";
-}
-
-function getURLParam($key) {
-	return isset($_GET[$key]) ? $_GET[$key] : '';
-}
-
-function setSessionRegisterViewOncePerSession() {
-    $_SESSION["viewOnce"] = 1;
-}
-
-function getSessionClickID() {
+function getSessionClickIDFromCSV() {
 	$path = 'clickids.csv';
 	$array = [];
 	if(file_exists($path)){
@@ -89,15 +31,6 @@ function getSessionClickID() {
 	return null;
 }
 
-function setSessionClickID($clickID = '') {
-	$path = 'clickids.csv';
-	$row = [getDeviceID(), $clickID];
-	if (($open = fopen($path, "a")) !== false) {
-		fputcsv($open, $row);
-		fclose($open);
-	}
-}
-
 function setHref($rtkClickID, $referrer) {
 	$script = <<<'HEREA'
 	<script>
@@ -105,14 +38,14 @@ function setHref($rtkClickID, $referrer) {
 			return str.replace(/\/$/, "");
 		}
 		document.querySelectorAll('a').forEach(function (el) {
-			if (el.href.indexOf("http://track.red-track.net/click") > -1) {
+			if (el.href.indexOf("https://red-track.net/click") > -1) {
 				if (el.href.indexOf('?') > -1) {
 					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
 					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				}
 			}
-			if (el.href.indexOf("http://track.red-track.net/preclick") > -1) {
+			if (el.href.indexOf("https://red-track.net/preclick") > -1) {
 				if (el.href.indexOf('?') > -1) {
 					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
@@ -125,10 +58,69 @@ function setHref($rtkClickID, $referrer) {
 	echo str_replace(':referrer', $referrer, str_replace(':clickID', $rtkClickID, $script));
 }
 
-function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
+function getDeviceID()
+{
+    $userAgent = $_SERVER['HTTP_USER_AGENT'];
+    $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+    $ipAddress = $_SERVER['REMOTE_ADDR'];
+	$method = $_SERVER['REQUEST_METHOD'];
+	$sec_ch_ua = $_SERVER['HTTP_SEC_CH_UA'];
+	$http_accept = $_SERVER['HTTP_ACCEPT'];
 
-	if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
-		$url = "http://track.red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+    $fingerprint = $userAgent . $acceptLanguage . $ipAddress . $method . $sec_ch_ua . $http_accept;
+    return md5($fingerprint);
+}
+
+function parseBool($value, $defaultValue) {
+    if ($value === 'true' || $value === 'false' || $value === true || $value === false) {
+        return strtolower($value);
+    } else {
+        return $defaultValue;
+    }
+}
+
+
+function getMyCookie($name) {
+    if (isset($_COOKIE[$name])) {
+        return $_COOKIE[$name];
+    }
+    return null;
+}
+
+
+function removeParam($key, $sourceURL) {
+    $urlParts = explode('?', $sourceURL, 2);
+    $url = $urlParts[0];
+    $queryString = isset($urlParts[1]) ? $urlParts[1] : '';
+
+    if ($queryString !== '') {
+        $params = [];
+        $params_arr = explode('&', $queryString);
+        foreach ($params_arr as $param) {
+            list($name, $value) = explode('=', $param, 2);
+            if ($name !== $key) {
+                $params[] = $param;
+            }
+        }
+        if (!empty($params)) {
+            $url .= '?' . implode('&', $params);
+        }
+    }
+    return $url;
+}
+
+function getURLParam($key) {
+	if(isset($_GET[$key])){
+        return $_GET[$key];
+    }
+	return null;
+};
+
+
+
+function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
+	if(isset($_SESSION['viewOnce']) && $_SESSION['viewOnce'] != 1){
+		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -141,97 +133,118 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 			die("cURL Error: $error");
 		}
 		curl_close($ch);
-
-		$url1 = "http://track.red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
-		$ch1 = curl_init();
-		curl_setopt($ch1, CURLOPT_URL, $url1);
-		curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch1, CURLOPT_CUSTOMREQUEST, 'GET');
-		$response1 = curl_exec($ch1);
-		if ($response1 === false) {
-			// Handle the error
-			$error = curl_error($ch1);
-			curl_close($ch1);
-			die("cURL Error: $error");
-		}
-		curl_close($ch1);
 	}
 
     if ($registerViewOncePerSession) {
-        setSessionRegisterViewOncePerSession();
+        $_SESSION["viewOnce"] = 1;
     }
 }
 
-function trackWebsite(){
-	$defaultCampaignId = $_GET['defaultcampaignid'] ?? "65553e9b3df94c0001af7765";
-	$cookieDomain = $_GET['cookiedomain'] ?? "po.trade";
-	$cookieDuration = $_GET['cookieduration'] ?? 90;
-	$registerViewOncePerSession = $_GET['regviewonce'] ?? false;
-	$lastPaidClickAttribution = false;
-	$firstClickAttribution = false;
-	$attribution = $_GET['attribution'] ?? "lastpaid";
-	$referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "";
-	if ($attribution === 'lastpaid') {
-		$lastPaidClickAttribution = true;
-	} else if ($attribution === 'firstclick') {
-		$lastPaidClickAttribution = false;
-		$firstClickAttribution = true;
-	} else if ($attribution === 'lastclick') {
-		$lastPaidClickAttribution = false;
-		$firstClickAttribution = false;
-	}
-	
-	$cookieName = "rtkclickid-store";
+function checkIsExistAndSet($clickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain) {
 	$ourCookie = getMyCookie($cookieName);
-	$locSearch = getCurrentLocationSearch();
-	$rtkfbp = getMyCookie('_fbp');
-	$rtkfbc = getMyCookie('_fbc');
-	$pixelParams = ($locSearch != '' ? ("&" . $locSearch) : "") . "&sub19=" . $rtkfbp . "&sub20=" . $rtkfbc;
-	$campaignID = getURLParam('cmpid');
-	$souceKey = getURLParam('tsource');
-	if ($campaignID == "") {
-		$campaignID = $defaultCampaignId;
+    if (!isset($_COOKIE['ourCookie']) || $_COOKIE['ourCookie'] === null || $_COOKIE['ourCookie'] === '' || !$firstClickAttribution) {
+		setMyCookie($cookieName, $clickID, $cookieDuration, $cookieDomain);
 	}
-	
-	$initialSrc = "http://track.red-track.net/" . $campaignID . "?format=json&referrer=" . $referrer;
-	
-	for ($i = 1; $i <= 10; $i++) {
-		$initialSrc = removeParam("sub".$i, $initialSrc);
-	}
-	
-	$initialSrc = removeParam("cost", $initialSrc);
-	$initialSrc = removeParam("ref_id", $initialSrc);
+}
 
-	if (!getURLParam('rtkcid')) {
-		$rtkClickID = "";
-		if (!getSessionClickID()) {
-			$url = $initialSrc . $pixelParams;
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-			$response = curl_exec($ch);
-			if ($response === false) {
-				// Handle the error
-				$error = curl_error($ch);
-				curl_close($ch);
-				die("cURL Error: $error");
-			}
-			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
-			setSessionClickID($rtkClickID);
-			setHref($rtkClickID, $referrer);
-			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
-			curl_close($ch);
-		} else {
-			$rtkClickID = getSessionClickID();
-			setHref($rtkClickID, $referrer);
-			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
-		}
-	} else {
-		$rtkClickID = getURLParam('rtkcid');
-		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
-		setHref($rtkClickID, $referrer);
-		setSessionClickID($rtkClickID);
-	}
+function setSessionClickID($clickID = '') {
+    $_SESSION["rtkclickid"] = $clickID;
+}
 
+function setMyCookie($cookieName, $rtkClickID, $cookieDuration, $cookieDomain) {
+	date_default_timezone_set("UTC");
+    $cookieValue = $rtkClickID;
+	$expirationTime = 86400 * $cookieDuration * 1000;
+	$dateTimeNow = time();
+	setcookie($cookieName, $cookieValue, $dateTimeNow + $expirationTime, $cookieDomain); 
+}
+
+function trackWebsite(){
+
+    $defaultCampaignId = $_GET['defaultcampaignid'] ?? "65553e9b3df94c0001af7765";
+    $cookieDomain = $_GET['cookiedomain'] ?? "po.trade";
+    $registerViewOncePerSession =  isset($_GET['regviewonce']) ? parseBool($_GET['regviewonce'], false) : parseBool("false", false);
+    $lastPaidClickAttribution = false;
+    $firstClickAttribution = false;
+    $attribution = $_GET['attribution'] ?? "lastpaid";
+    $cookieName = "rtkclickid-store";
+    $cookieDuration = $_GET['cookieduration'] ?? 90;
+    $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "";
+    if ($attribution === 'lastpaid') {
+        $lastPaidClickAttribution = true;
+    }
+    else if ($attribution === 'firstclick')  {
+        $lastPaidClickAttribution = false;
+        $firstClickAttribution = true;
+    }
+    else if ($attribution === 'lastclick')  {
+        $lastPaidClickAttribution = false;
+        $firstClickAttribution = false;
+    }
+    $ourCookie = getMyCookie('rtkclickid-store');
+    
+    $rtkClickID = "";
+
+    $locSearch = ltrim($_SERVER['QUERY_STRING'], '?');
+
+    $rtkfbp = getMyCookie('_fbp');
+    $rtkfbc = getMyCookie('_fbc');
+
+    $pixelParams = "&" . $locSearch . "&sub19=" . $rtkfbp . "&sub20=" . $rtkfbc;
+    $campaignID = getURLParam('cmpid');
+    $souceKey = getURLParam('tsource');
+
+    if ($campaignID == null) {
+        $campaignID = $defaultCampaignId;
+    }
+
+    if ($lastPaidClickAttribution) {
+        if ($campaignID != $defaultCampaignId) {
+            $firstClickAttribution = false;
+        }
+        if ($campaignID == $defaultCampaignId) {
+            $firstClickAttribution = true;
+        }
+    }
+
+    $initialSrc = "https://red-track.net/" . $campaignID . "?format=json" . "&referrer=" . $referrer;
+    for ($i = 1; $i <= 10; $i++) {
+        $initialSrc = removeParam("sub" . $i, $initialSrc);
+    }
+
+    $rawData = null;
+    $initialSrc = removeParam("cost", $initialSrc);
+    $initialSrc = removeParam("ref_id", $initialSrc);
+
+    if (!isset($_GET['rtkcid'])) {
+        if(!isset($_SESSION['rtkclickid']) || $_SESSION['rtkclickid'] == ''){
+            $url = $initialSrc . $pixelParams;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+            $response = curl_exec($ch);
+            if ($response === false) {
+                // Handle the error
+                $error = curl_error($ch);
+                curl_close($ch);
+                die("cURL Error: $error");
+            } else {
+                $rtkClickID = json_decode($response)->clickid ?? md5(uniqid(rand(), true));
+                setSessionClickID($rtkClickID);
+                checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
+                xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
+            }
+            curl_close($ch);
+        }else{
+            $rtkClickID = $_SESSION['rtkclickid'];
+            checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
+            xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
+        }
+    }else{
+        $rtkClickID = $_GET['rtkcid'];
+        checkIsExistAndSet($rtkClickID, $firstClickAttribution, $cookieName, $cookieDuration, $cookieDomain);
+        xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
+        setSessionClickID($rtkClickID);
+    }
 }
