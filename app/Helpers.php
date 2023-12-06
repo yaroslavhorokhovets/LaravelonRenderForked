@@ -105,14 +105,14 @@ function setHref($rtkClickID, $referrer) {
 			return str.replace(/\/$/, "");
 		}
 		document.querySelectorAll('a').forEach(function (el) {
-			if (el.href.indexOf("http://track.red-track.net/click") > -1) {
+			if (el.href.indexOf("https://track.red-track.net/click") > -1) {
 				if (el.href.indexOf('?') > -1) {
 					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
 					el.href = stripTrailingSlash(el.href) + "?clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				}
 			}
-			if (el.href.indexOf("http://track.red-track.net/preclick") > -1) {
+			if (el.href.indexOf("https://track.red-track.net/preclick") > -1) {
 				if (el.href.indexOf('?') > -1) {
 					el.href = stripTrailingSlash(el.href) + "&clickid=" + ":clickID" + "&referrer=" + ":referrer"
 				} else {
@@ -128,7 +128,7 @@ function setHref($rtkClickID, $referrer) {
 function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 
 	if(!isset($_SESSION["viewOnce"]) || $_SESSION["viewOnce"] != 1) {
-		$url = "http://track.red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$url = "https://red-track.net/view?clickid=" . $rtkClickID . "&referrer=" . $referrer;
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -142,7 +142,7 @@ function xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession) {
 		}
 		curl_close($ch);
 
-		$url1 = "http://track.red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
+		$url1 = "https://red-track.net/preview?clickid=" . $rtkClickID . "&referrer=" . $referrer;
 		$ch1 = curl_init();
 		curl_setopt($ch1, CURLOPT_URL, $url1);
 		curl_setopt($ch1, CURLOPT_RETURNTRANSFER, true);
@@ -193,7 +193,7 @@ function trackWebsite(){
 		$campaignID = $defaultCampaignId;
 	}
 	
-	$initialSrc = "http://track.red-track.net/" . $campaignID . "?format=json&referrer=" . $referrer;
+	$initialSrc = "https://red-track.net/" . $campaignID . "?format=json&referrer=" . $referrer;
 	
 	for ($i = 1; $i <= 10; $i++) {
 		$initialSrc = removeParam("sub".$i, $initialSrc);
@@ -219,18 +219,18 @@ function trackWebsite(){
 			}
 			$rtkClickID = isset($response) ? json_decode($response)->clickid : md5(uniqid(rand(), true));
 			setSessionClickID($rtkClickID);
-			setHref($rtkClickID, $referrer);
+			//setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 			curl_close($ch);
 		} else {
 			$rtkClickID = getSessionClickID();
-			setHref($rtkClickID, $referrer);
+			//setHref($rtkClickID, $referrer);
 			xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
 		}
 	} else {
 		$rtkClickID = getURLParam('rtkcid');
 		xhrrOpenAndSend($rtkClickID, $referrer, $registerViewOncePerSession);
-		setHref($rtkClickID, $referrer);
+		//setHref($rtkClickID, $referrer);
 		setSessionClickID($rtkClickID);
 	}
 

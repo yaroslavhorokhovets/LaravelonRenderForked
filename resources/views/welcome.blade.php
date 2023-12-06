@@ -85,8 +85,8 @@
                     Test URLs
                 </div>
                 <div class="links">
-                    <a href="http://track.red-track.net/click/1">Click/1</a>
-                    <a href="http://track.red-track.net/click">Click</a>
+                    <a href="https://red-track.net/click/1">Click/1</a>
+                    <a href="https://red-track.net/click">Click</a>
                 </div>
             </div>
         </div>
