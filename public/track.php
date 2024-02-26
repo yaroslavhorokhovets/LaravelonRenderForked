@@ -56,7 +56,7 @@ function sendRequest()
     // Get the event name from the incoming request.
 	$eventName = isset($_REQUEST['event']) ? $_REQUEST['event'] : "PageView"; // or FormSubmit, AddToCart, OutboundClicks
 
-	$propertyid = isset($_REQUEST['aid']) ? $_REQUEST['aid'] : "iMaKRTVWjJ5T";
+	$propertyid = isset($_REQUEST['aid']) ? $_REQUEST['aid'] : "9uiqd2JrkoSV";
 	// Get the current DateTime object
 	$dateTime = new DateTime();
 	// Get the current timestamp in milliseconds
@@ -73,8 +73,8 @@ function sendRequest()
 	$url .= "&nc=" . 1;
 	$url .= "&en=" . rawurlencode($eventName);
 	$url .= "&dl=" . rawurlencode(getDocumentLocation());
+	$url .= "&dr=" . rawurlencode(getDocumentLocation());
 	$url .= "&dt=" . rawurlencode($title);
-	$url .= "&dr=" . rawurlencode($title);
 
 	// Check if the query string exists
 	if(isset($_SERVER['QUERY_STRING'])) {
@@ -99,13 +99,9 @@ function sendRequest()
 		curl_close($ch);
 		die("cURL Error: $error");
 	} else {
-		var_dump(array(
-            "URL" => $url,
-            "Event Name" => $eventName,
-            "Response" => $response
-        ));
+		return $response;
 	}
 	curl_close($ch);
 }
 
-sendRequest();
+echo sendRequest();

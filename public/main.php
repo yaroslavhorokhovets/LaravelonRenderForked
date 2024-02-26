@@ -7,8 +7,8 @@ function setDocumentTitle()
 		function sendAnyTrackRequest(event) {
 			var pageTitle = document.title;
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', 'track.php?aid=iMaKRTVWjJ5T&event=' + event + '&title=' + encodeURIComponent(pageTitle), true);
-			xhr.onload = function() { if (xhr.status == 200) { console.log(xhr.responseText); var p = document.createElement('p'); p.innerText = xhr.responseText; p.style.textWrap = 'wrap'; document.getElementById('result').append(p); } else { console.error('Error: ' + xhr.status); } }
+			xhr.open('GET', 'track.php?event=' + event + '&title=' + encodeURIComponent(pageTitle), true);
+			xhr.onload = function() { if (xhr.status == 200) { var p = document.createElement('p'); p.innerText = xhr.responseText; p.style.textWrap = 'wrap'; document.getElementById('result').append(p); } else { console.error('Error: ' + xhr.status); } }
 			xhr.send();
 		}
 		window.addEventListener('load', function() {
