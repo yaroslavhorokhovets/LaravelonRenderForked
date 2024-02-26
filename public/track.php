@@ -72,8 +72,14 @@ function sendRequest()
 	$url .= "&ts=" . $timestampInMillis;
 	$url .= "&nc=" . 1;
 	$url .= "&en=" . rawurlencode($eventName);
-	$url .= "&dl=" . rawurlencode(getDocumentLocation());
-	$url .= "&dr=" . rawurlencode(getDocumentLocation());
+
+	$dl = getDocumentLocation();
+	$tmp = explode("&", $dl);
+	array_pop($tmp);
+	$dr = implode("&", $tmp);
+
+	$url .= "&dl=" . rawurlencode($dl);
+	$url .= "&dr=" . rawurlencode($dr);
 	$url .= "&dt=" . rawurlencode($title);
 
 	// Check if the query string exists
@@ -99,9 +105,11 @@ function sendRequest()
 		curl_close($ch);
 		die("cURL Error: $error");
 	} else {
-		return $response;
+		return array(
+            "URL" => $url
+        );
 	}
 	curl_close($ch);
 }
 
-echo sendRequest();
+echo json_encode(sendRequest());

@@ -8,7 +8,7 @@ function setDocumentTitle()
 			var pageTitle = document.title;
 			var xhr = new XMLHttpRequest();
 			xhr.open('GET', 'track.php?event=' + event + '&title=' + encodeURIComponent(pageTitle), true);
-			xhr.onload = function() { if (xhr.status == 200) { var p = document.createElement('p'); p.innerText = xhr.responseText; p.style.textWrap = 'wrap'; document.getElementById('result').append(p); } else { console.error('Error: ' + xhr.status); } }
+			xhr.onload = function() { if (xhr.status == 200) { var result = JSON.parse(xhr.responseText); console.log(result); var p = document.createElement('a'); p.innerText = result.URL; p.target="_black"; p.href=result.URL; p.style.display = 'block'; document.getElementById('result').append(p); } else { console.error('Error: ' + xhr.status); } }
 			xhr.send();
 		}
 		window.addEventListener('load', function() {
